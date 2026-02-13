@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Special Promise</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary-pink: #ffafbd;
+            --accent-red: #d63031;
+            --knight-bg: #1a1a1a;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ffafbd, #ffc3a0);
+            font-family: 'Georgia', serif;
+            overflow-x: hidden; /* Prevent horizontal scroll from moving button */
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            max-width: 550px;
+            width: 92%;
+            z-index: 10;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        button {
+            padding: 12px 30px; font-size: 1.1rem;
+            border: none; border-radius: 50px;
+            cursor: pointer; font-weight: bold;
+            transition: 0.3s;
+        }
+
+        #yesBtn, #finalPromiseBtn, #backBtn { background-color: var(--accent-red); color: white; }
+        #noBtn, #declineBtn { background-color: #b2bec3; color: white; }
+
+        /* Modal Box */
+        #promiseModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 450px;
+            width: 85%;
+            position: relative;
+        }
+
+        /* Knight Screen */
+        #knightScreen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .knight-gif {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255,0,0,0.3);
+        }
+
+        /* Result Section */
+        #celebration { display: none; }
+        .photo-frame {
+            width: 100%; max-width: 350px; margin: 20px auto;
+            border: 10px solid white; border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .couple-photo { width: 100%; height: auto; display: block; background: #eee; }
+        
+        .letter-content {
+            text-align: left; line-height: 1.8;
+            background: #fffafa; padding: 25px;
+            border-radius: 15px; border: 1px solid #fab1a0;
+            white-space: pre-line; font-size: 1rem;
+            color: #333;
+        }
+
+        /* Fixed the No button behavior */
+        #noBtn { transition: 0.2s ease; z-index: 50; }
+    </style>
+</head>
+<body>
+
+    <audio id="bgm" loop>
+        <source src="song.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="container" id="mainCard">
+        <div id="questionArea">
+            <h1 style="color: var(--accent-red);">Hi Kunjusee ❤️</h1>
+            <h2 style="color: #444;">Aparna Vijay, will you be my Valentine?</h2>
+            <div style="margin-top: 50px; display: flex; justify-content: center; gap: 20px; min-height: 60px;">
+                <button id="yesBtn" onclick="openModal()">Yes!</button>
+                <button id="noBtn" onmouseover="moveButton()" onclick="moveButton()">No</button>
+            </div>
+        </div>
+
+        <div id="celebration">
+            <h1 style="color: var(--accent-red);">I Knew You'd Say Yes! 💖</h1>
+            <div class="photo-frame">
+                <img src="our-photo.jpg" alt="Our Photo" class="couple-photo">
+            </div>
+            <div class="letter-content">
+                My Dear Love,
+                I don’t ask for the world, I don’t ask for perfection… I only ask for one promise from you — that no matter what life brings, we choose each other every single day.
+
+                Promise me that when days get heavy, we won’t let go. Promise me that even in silence, our hearts will still speak. Promise me that this love we hold so gently will always be protected by both of us.
+
+                I promise you the same — my loyalty, my patience, my effort, and a love that doesn’t fade with time. Let’s promise to stay, to fight for us, and to grow together.
+
+                Because with you, love feels like home. ❤️
+                You are the most beautiful person I know, inside and out. I want to be yours forever.
+
+                <strong>Always yours, Pranav </strong>
+            </div>
+            <div style="display: flex; justify-content: center; margin-top: 15px;">
+                <img src="https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif" style="width: 80px; margin: 5px;">
+                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJueGZueGZueGZueGZueGZueGZueGZueGZueGZueGZueGZueGZueCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/KztT2c4u8mYYUiMKdJ/giphy.gif" style="width: 80px; margin: 5px;">
+            </div>
+        </div>
+    </div>
+
+    <div id="promiseModal">
+        <div class="modal-content" id="modalBox">
+            <div id="modalPrompt">
+                <h1 style="color: var(--accent-red); font-size: 2.2rem;">PROMISE?</h1>
+                <p style="font-size: 1.1rem; color: #555;">Will you choose me every single day?</p>
+                <div style="display: flex; justify-content: center; gap: 15px; margin-top: 25px;">
+                    <button id="finalPromiseBtn" onclick="revealAll()">I Promise</button>
+                    <button id="declineBtn" onclick="showKnight()">No</button>
+                </div>
+            </div>
+
+            <div id="knightScreen">
+                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGFpdm9ueGRxcHk0Z3R3dzZ3YnF3eGZ3bmR6eGZ3bmR6eGZ3bmR6eCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l41K3o5uJqLw8B6Y8/giphy.gif" class="knight-gif">
+                <h2 style="color: #333; margin-top: 15px;">My heart has fallen...</h2>
+                <button id="backBtn" onclick="backToPromise()" style="margin-top: 10px;">Wait, I promise!</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const music = document.getElementById('bgm');
+
+        function moveButton() {
+            const btn = document.getElementById('noBtn');
+            // Ensure button doesn't go off screen
+            const x = Math.random() * (window.innerWidth - btn.offsetWidth - 20);
+            const y = Math.random() * (window.innerHeight - btn.offsetHeight - 20);
+            
+            btn.style.position = 'fixed';
+            btn.style.left = x + 'px';
+            btn.style.top = y + 'px';
+        }
+
+        function openModal() {
+            document.getElementById('promiseModal').style.display = 'flex';
+        }
+
+        function showKnight() {
+            document.getElementById('modalPrompt').style.display = 'none';
+            document.getElementById('knightScreen').style.display = 'flex';
+        }
+
+        function backToPromise() {
+            document.getElementById('modalPrompt').style.display = 'block';
+            document.getElementById('knightScreen').style.display = 'none';
+        }
+
+        function revealAll() {
+            // Attempt to play music (browsers require user interaction, which 'Yes' provides)
+            music.play().catch(e => console.log("Audio play failed:", e));
+            
+            document.getElementById('promiseModal').style.display = 'none';
+            document.getElementById('questionArea').style.display = 'none';
+            document.getElementById('celebration').style.display = 'block';
+            
+            // Continuous Confetti for 5 seconds
+            var end = Date.now() + (5 * 1000);
+            (function frame() {
+                confetti({ 
+                    particleCount: 3, 
+                    angle: 60, 
+                    spread: 55, 
+                    origin: { x: 0 }, 
+                    colors: ['#d63031', '#fd79a8'] 
+                });
+                confetti({ 
+                    particleCount: 3, 
+                    angle: 120, 
+                    spread: 55, 
+                    origin: { x: 1 }, 
+                    colors: ['#d63031', '#fd79a8'] 
+                });
+                if (Date.now() < end) { requestAnimationFrame(frame); }
+            }());
+        }
+    </script>
+</body>
+</html>
